@@ -1,14 +1,15 @@
 /**
  * Created by dmytro on 12.07.16.
  */
-var cron = require('node-cron');
-var config = require('./config');
-var MongoClient = require('mongodb').MongoClient;
-var assert = require('assert');
-var carService = require('./services/car-service');
-var url = config.get('db:url');
+'use strict';
+let cron = require('node-cron');
+let config = require('./config');
+let MongoClient = require('mongodb').MongoClient;
+let assert = require('assert');
+let carService = require('./services/car-service');
+let  url = config.get('db:url');
 
-cron.schedule('* * * * *', function () {
+//cron.schedule('* * * * *', function () {
     console.log('running a task every minute');
     MongoClient.connect(url, function (err, db) {
         assert.equal(null, err);
@@ -18,4 +19,4 @@ cron.schedule('* * * * *', function () {
             db.close();
         });
     });
-});
+//});
