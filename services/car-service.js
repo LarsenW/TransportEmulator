@@ -8,10 +8,11 @@ exports.handleArrivedCars = function (db, callback) {
     let cars = db.collection('cars');
     cars.find({"arrivalTime": {$lt: new Date()}}).toArray(function (err, carsArray) {
         assert.equal(err, null);
-        new Promise((resolve, reject)=> {
-            let orders = db.collection('orders');
-            for (let car of carsArray) {
-                new Promise((resolve, reject)=> {
+        if (carsArray.length > 0) {
+            new Promise((resolve, reject)=> {
+                let orders = db.collection('orders');
+                for (let i = 0; i < carsArray.length; i++) {
+                    let car = carsArray[i];
                     orders.updateOne({"_id": car._order}, {$set: {"state": 2}}, function (err, r) {
                         assert.equal(null, err);
                         cars.updateOne({"_id": car._id}, {
@@ -22,14 +23,21 @@ exports.handleArrivedCars = function (db, callback) {
                             }
                         }, function (err, r) {
                             assert.equal(null, err);
-                            resolve();
+                            if (i == carsArray.length - 1) {
+                                resolve(i);
+                            }
                         })
                     })
-                })
-            }
-        }).then(()=> {
+                }
+            }).then((i)=> {
+                console.log(i);
+                callback();
+            })
+        } else {
+            console.log('else callback');
             callback();
-        })
+        }
+
     })
 }
 /*
