@@ -11,24 +11,58 @@ exports.handleArrivedCars = function (db, callback) {
         if (carsArray.length > 0) {
             new Promise((resolve, reject)=> {
                 let orders = db.collection('orders');
-                for (let i = 0; i < carsArray.length; i++) {
-                    let car = carsArray[i];
-                    orders.updateOne({"_id": car._order}, {$set: {"state": 2}}, function (err, r) {
-                        assert.equal(null, err);
-                        cars.updateOne({"_id": car._id}, {
-                            $set: {
-                                "arrivalTime": null,
-                                "isAvailable": true,
-                                "_order": null
-                            }
-                        }, function (err, r) {
-                            assert.equal(null, err);
-                            if (i == carsArray.length - 1) {
-                                resolve(i);
-                            }
-                        })
-                    })
-                }
+                (function (iterations) {
+                    let i = 0;
+
+                    function forloop() {
+                        if (i < iterations) {
+                           // i++;
+                            let car = carsArray[i];
+                            orders.updateOne({"_id": car._order}, {$set: {"state": 2}}, function (err, r) {
+                                assert.equal(null, err);
+                                orders.find({"state": 0}).sort({"created": 1}).limit(1).next(function (err, order) {
+                                    if (order != null) {
+                                        orders.updateOne({"_id": order._id}, {$set: {"state": 1}}, function (err, r) {
+                                            assert.equal(err, null);
+                                            cars.updateOne({"_id": car._id}, {
+                                                    $set: {
+                                                        "arrivalTime": new Date(Date.now() + order.estimatedTime * 1000),
+                                                        "_order": order._id
+                                                    }
+                                                },
+                                                function (err, r) {
+                                                    assert.equal(null, err);
+                                                    i++;
+                                                    forloop();
+                                                    if (i == carsArray.length) {
+                                                        resolve(i);
+                                                    }
+                                                }
+                                            )
+                                        });
+                                    } else {
+                                        cars.updateOne({"_id": car._id}, {
+                                            $set: {
+                                                "arrivalTime": null,
+                                                "isAvailable": true,
+                                                "_order": null
+                                            }
+                                        }, function (err, r) {
+                                            assert.equal(null, err);
+                                            i++;
+                                            forloop()
+                                            if (i == carsArray.length) {
+                                                resolve(i);
+                                            }
+                                        })
+                                    }
+                                });
+                            })
+                        }
+                    }
+
+                    forloop();
+                })(carsArray.length);
             }).then((i)=> {
                 console.log(i);
                 callback();
@@ -37,13 +71,17 @@ exports.handleArrivedCars = function (db, callback) {
             console.log('else callback');
             callback();
         }
-
     })
 }
-/*
- exports.pullOrderFromQueue = function (db, callback) {
- var orders = db.collection('orders');
- orders.find({"state": 0}).toArray(function (err, docs) {
+/*exports.pullOrderFromQueue = function (db, callback) {
+ let orders = db.collection('orders');
+ orders.find({"state": 0}).sort({"created": 1}).limit(1).next(function (err, order) {
+ if (order != null) {
+ orders.updateOne({"_id": order._id}, {$set: {"state": 1}}, function (err, r) {
  assert.equal(err, null);
+
  });
+ }
+ });
+
  }*/
