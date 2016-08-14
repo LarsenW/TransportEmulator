@@ -1,6 +1,6 @@
 {
   "db": {
-    "url": "mongodb://localhost:27017/delivery"
+    "url": "mongodb://root:1111@ds023664.mlab.com:23664/delivery_bd1"
   },
   "delivery":{
     "host":"http://localhost:3000",

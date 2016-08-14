@@ -49,7 +49,7 @@ exports.handleArrivedCars = function (db, callback) {
                 callback(ordersArray);
             })
         } else {
-            console.log('else callback');
+            console.log('there is no arriverd cars');
             callback();
         }
     });
