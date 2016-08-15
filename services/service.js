@@ -1,9 +1,9 @@
 /**
- * Created by dmytro on 15.08.16.
+ * Created by dmytro on 14.07.16.
  */
 'use strict';
-let orderService = require('./order-service');
-exports.handleArrivedCars = function (db, callback) {
+
+/*exports.handleArrivedCars = function (db, callback) {
     let cars = db.collection('cars');
     findArrivedCars(cars).then((carsArray)=> {
         if (carsArray.length > 0) {
@@ -22,7 +22,7 @@ exports.handleArrivedCars = function (db, callback) {
                             }
                             let car = carsArray[i];
                             ordersArray.push(car._order);
-                            orderService.changeOrderStateToDelivered(orders, car)
+                            changeOrderStateToDelivered(orders, car)
                                 .then(()=> {
                                     if (!car.isActive) {
                                         throw new Error('deactivation');
@@ -31,12 +31,12 @@ exports.handleArrivedCars = function (db, callback) {
                                     }
                                 })
                                 .then(()=> {
-                                    return orderService.pollOrderFromQueue(orders)
+                                    return pollOrderFromQueue(orders)
                                 }).then((order)=> {
                                 if (!order) {
                                     throw new Error('empty queue')
                                 }
-                                return orderService.changeOrderStateToTrans(orders, order);
+                                return changeOrderStateToTrans(orders, order);
                             }).then((order)=> {
                                 return pickOrderByCar(cars, car, order);
                             }).then(()=> {
@@ -67,8 +67,8 @@ exports.handleArrivedCars = function (db, callback) {
             callback();
         }
     });
-};
-function findArrivedCars(cars) {
+}*/
+/*function findArrivedCars(cars) {
     return new Promise((resolve, reject)=> {
         cars.find({"arrivalTime": {$lt: new Date()}}).toArray(function (err, carsArray) {
             if (err) {
@@ -78,8 +78,38 @@ function findArrivedCars(cars) {
         })
     });
 
-};
-function pickOrderByCar(cars, car, order) {
+}*/
+/*function changeOrderStateToDelivered(orders, car) {
+    return new Promise((resolve, reject)=> {
+        orders.updateOne({"_id": car._order}, {$set: {"state": 2}}, function (err, r) {
+            if (err) {
+                reject(err);
+            }
+            resolve();
+        });
+    });
+}
+function pollOrderFromQueue(orders) {
+    return new Promise((resolve, reject)=> {
+        orders.find({"state": 0}).sort({"created": 1}).limit(1).next(function (err, order) {
+            if (err) {
+                reject(err)
+            }
+            resolve(order);
+        });
+    })
+}
+function changeOrderStateToTrans(orders, order) {
+    return new Promise((resolve, reject)=> {
+        orders.updateOne({"_id": order._id}, {$set: {"state": 1}}, function (err, r) {
+            if (err) {
+                reject(err)
+            }
+            resolve(order);
+        });
+    });
+}*/
+/*function pickOrderByCar(cars, car, order) {
     return new Promise((resolve, reject)=> {
         cars.updateOne({"_id": car._id}, {
                 $set: {
@@ -123,26 +153,27 @@ exports.checkActiveCars = function (db) {
             resolve(carsArray.length);
         })
     })
-}
-exports.getCarsTravelTime = function (db) {
-    let cars = db.collection('cars');
+}*/
+
+/*
+function getAllShippingOrders(db) {
+    let orders = db.collection('orders');
     return new Promise((resolve, reject)=> {
-        cars.find({'isActive': true}).toArray(function (err, cars) {
+        orders.find({"state": 0}).sort({"created": 1}).toArray(function (err, ordersArray) {
             if (err) {
                 reject(err);
+            } else {
+                resolve(ordersArray);
             }
-
-            let carsTime = [];
-
-            for (let i = 0; i < cars.length; i++) {
-                let travelTimeLeft;
-                if (( travelTimeLeft = cars[i].arrivalTime - Date.now()) < 0) {
-                    resolve(0);
-                    return;
-                }
-                carsTime[i] = travelTimeLeft;
-            }
-            resolve(carsTime);
         })
     })
-};
+
+}
+exports.updateOrdersArrivalTime = function (db) {
+    return new Promise((resolve, reject)=> {
+        getAllShippingOrders(db)
+            .then(()=> {
+
+            })
+    })
+}*/
