@@ -120,7 +120,7 @@ exports.checkActiveCars = function (db) {
             if (err) {
                 reject(err);
             }
-            resolve(carsArray.length);
+            resolve(carsArray);
         })
     })
 }
@@ -137,7 +137,7 @@ exports.getCarsTravelTime = function (db) {
             for (let i = 0; i < cars.length; i++) {
                 let travelTimeLeft;
                 if (( travelTimeLeft = cars[i].arrivalTime - Date.now()) < 0) {
-                    resolve(0);
+                    resolve([0]);
                     return;
                 }
                 carsTime[i] = travelTimeLeft;

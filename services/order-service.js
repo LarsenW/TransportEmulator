@@ -4,7 +4,7 @@
 'use strict';
 let carService = require('./car-service');
 let eachSeries = require('async/eachSeries');
-let Sugar = require('sugar');
+let _ = require("underscore");
 
 exports.changeOrderStateToDelivered = function changeOrderStateToDelivered(orders, car) {
     return new Promise((resolve, reject)=> {
@@ -71,7 +71,7 @@ function determineArrivalTime(db, shippingOrders, carsTravelTime) {
         let currentIndex = -1;
         eachSeries(shippingOrders, function (order, callback) {
             currentIndex++;
-            let minElement = Sugar.Array.min(carsTravelTime);
+            let minElement = _.min(carsTravelTime);
             let minElementIndex = carsTravelTime.indexOf(minElement);
             carsTravelTime[minElementIndex] += order.travelTime * 1000;
             console.log(new Date(Date.now() + carsTravelTime[minElementIndex]));
