@@ -83,7 +83,7 @@ function pickOrderByCar(cars, car, order) {
     return new Promise((resolve, reject)=> {
         cars.updateOne({"_id": car._id}, {
                 $set: {
-                    "arrivalTime": new Date(Date.now() + order.estimatedTime * 1000),
+                    "arrivalTime": new Date(Date.now() + order.travelTime * 1000),
                     "_order": order._id
                 }
             },
