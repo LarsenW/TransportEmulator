@@ -17,7 +17,6 @@ cron.schedule('* * * * *', function () {
                 assert.equal(null, err);
                 console.log("Connected succesfully to DB server");
                 carService.handleArrivedCars(db, function (ordersArray) {
-
                     return carService.checkActiveCars(db)
                         .then((cars)=> {
                             if (!activeCars) {
