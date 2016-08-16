@@ -116,7 +116,7 @@ function makeCarFree(cars, car) {
 exports.checkActiveCars = function (db) {
     let cars = db.collection('cars');
     return new Promise((resolve, reject)=> {
-        cars.find({"isActive": true}).toArray(function (err, carsArray) {
+        cars.find({"isActive": true}, {"_id": 1}).toArray(function (err, carsArray) {
             if (err) {
                 reject(err);
             }
