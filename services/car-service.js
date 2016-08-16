@@ -2,6 +2,9 @@
  * Created by dmytro on 15.08.16.
  */
 'use strict';
+let EmptyQueueError = require('../common/errors/empty-queue-error');
+let DeactivationError = require('../common/errors/deactivation-error');
+
 let orderService = require('./order-service');
 exports.handleArrivedCars = function (db, callback) {
     let cars = db.collection('cars');
@@ -25,7 +28,7 @@ exports.handleArrivedCars = function (db, callback) {
                             orderService.changeOrderStateToDelivered(orders, car)
                                 .then(()=> {
                                     if (!car.isActive) {
-                                        throw new Error('deactivation');
+                                        throw new DeactivationError('deactivation');
                                     } else {
                                         return
                                     }
@@ -34,7 +37,7 @@ exports.handleArrivedCars = function (db, callback) {
                                     return orderService.pollOrderFromQueue(orders)
                                 }).then((order)=> {
                                 if (!order) {
-                                    throw new Error('empty queue')
+                                    throw new EmptyQueueError('empty queue')
                                 }
                                 return orderService.changeOrderStateToTrans(orders, order);
                             }).then((order)=> {
@@ -44,13 +47,14 @@ exports.handleArrivedCars = function (db, callback) {
                                 forloop();
                             }).catch(err=> {
                                 console.log(err.message);
-                                if (err.message == 'deactivation' || err.message == 'empty queue')
+                                if (err instanceof EmptyQueueError || err instanceof DeactivationError) {
                                     makeCarFree(cars, car).then(()=> {
                                         i++;
                                         forloop();
                                     }).catch(err=> {
                                         console.log(err);
                                     })
+                                }
                             })
                         }
 
