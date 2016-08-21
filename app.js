@@ -5,15 +5,16 @@ let MongoClient = require('mongodb').MongoClient;
 let carService = require('./services/car-service');
 let orderService = require('./services/order-service');
 let deliveryNotifier = require('./services/delivery-notifier');
-let url = config.get('db:url');
 let activeCars = false;
 let _ = require("underscore");
+let uri = process.env.NODE_ENV == 'production' ? config.get('db:production_uri')
+    : config.get('db:development_uri');
 
 cron.schedule('* * * * *', function () {
     console.log('running a task every minute');
-    MongoClient.connect(url, function (err, db) {
+    MongoClient.connect(uri, function (err, db) {
             if (!err) {
-                console.log("Connected succesfully to DB server");
+                console.log("Connected succesfully to DB server: " + uri);
                 carService.handleArrivedCars(db, function (ordersArray) {
                     return carService.checkActiveCars(db)
                         .then((cars)=> {
