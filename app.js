@@ -14,7 +14,7 @@ cron.schedule('* * * * *', function () {
     console.log('running a task every minute');
     MongoClient.connect(uri, function (err, db) {
             if (!err) {
-                console.log("Connected succesfully to DB server: " + uri);
+                console.log("Connected successfully to DB server: " + uri + "\n" + new Date());
                 carService.handleArrivedCars(db, function (ordersArray) {
                     return carService.checkActiveCars(db)
                         .then((cars)=> {
