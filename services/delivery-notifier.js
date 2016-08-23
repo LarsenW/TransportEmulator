@@ -8,6 +8,8 @@ let config = require('../config');
 let url = config.get('delivery:host') + config.get('delivery:path');
 exports.notify = function (ordersArray) {
     let requestBody = JSON.stringify(ordersArray);
+    console.log(url);
+    console.log(requestBody);
     request({
         uri: url,
         method: "POST",
@@ -15,7 +17,8 @@ exports.notify = function (ordersArray) {
         body: requestBody
     }, function (err, resposne, body) {
         if (err) {
-            console.log(err)
+            console.log(err);
+            console.log(err.message);
         } else {
             console.log(body);
         }

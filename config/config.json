@@ -4,7 +4,7 @@
     "production_uri": "mongodb://root:1111@ds013366.mlab.com:13366/delivery_db"
   },
   "delivery":{
-    "host":"http://localhost:3000",
+    "host":"http://ec2-54-201-172-12.us-west-2.compute.amazonaws.com:9000",
     "path":"/delivered"
   }
 }
